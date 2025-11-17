@@ -1,53 +1,57 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
-import { Platform } from 'react-native';
-
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
+export type Theme = {
+  background: string;
+  text: string;
+  card: string;
+  cardActive: string;
+  modalBackground: string;
+  modalCard: string;
+  buttonPrimary: string;
+  buttonSecondary: string;
+  subtleText: string;
+  safeAreaColor: string;
+  iconDimmed: string;
+  accent: string;
+  sliderThumb: string;
+  clockActive: string;
+  clockInactive: string;
 };
 
-export const Fonts = Platform.select({
-  ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
-    serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
-    mono: 'ui-monospace',
-  },
-  default: {
-    sans: 'normal',
-    serif: 'serif',
-    rounded: 'normal',
-    mono: 'monospace',
-  },
-  web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-    serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
-  },
-});
+
+
+export const LightTheme: Theme = {
+  background: "#fff2dcff",
+  text: "#120e07ff",
+  card: "#ffe9c3ff",
+  cardActive: "#bbab8fff",
+  modalBackground: "rgba(0,0,0,0.5)",
+  modalCard: "#fff2dcff",
+  buttonPrimary: "#ffbc5fff",
+  buttonSecondary: "#61401bff",
+  subtleText: "#876533ff",
+  safeAreaColor: "#ffe1baff",
+  iconDimmed: "#ad9374ff",
+  accent: "#ffab52ff",
+  sliderThumb: "#ffbc5fff",
+  clockActive: "#ffe9c3ff",
+  clockInactive:"#bbab8fff",
+};
+
+export const DarkTheme: Theme = {
+  background: "#312126ff",
+  text: "#FFFFFF",
+  card: "#39262dff",
+  cardActive: "#634453ff",
+  modalBackground: "rgba(255, 255, 255, 0.12)",
+  modalCard: "#311c23ff",
+  buttonPrimary: "#b22766ff",
+  buttonSecondary: "#7b626cff",
+  subtleText: "#AAAAAA",
+  safeAreaColor: "#1b1419ff",
+  iconDimmed: "#666666",
+  accent: "#a43362ff",
+  sliderThumb: "#a12e5aff",
+  clockActive: "#634453ff",
+  clockInactive:"#39262dff",  
+};
+
+
