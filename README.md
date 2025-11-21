@@ -1,50 +1,156 @@
-# Welcome to your Expo app 👋
+# ⏱️ Chess Clock (Expo + React Native)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A simple and lightweight chess clock built with **Expo**, **React Native**, and **TypeScript**.
+This project demonstrates mobile app development concepts including timers, theming, state management, navigation, and persistent settings.
 
-## Get started
+---
 
-1. Install dependencies
+## 📌 Features
 
-   ```bash
-   npm install
-   ```
+* Two-player chess clock
+* Tap to switch turns
+* Pause & resume
+* Light & dark theme
+* Persistent settings via AsyncStorage
+* Sub-second display options
+* Custom time formatting (tenths, hundredths, milliseconds)
 
-2. Start the app
+---
 
-   ```bash
-   npx expo start
-   ```
+## 📦 Prerequisites
 
-In the output, you'll find options to open the app in a
+* Node.js (LTS recommended)
+* Expo CLI
+* A smartphone with Expo Go
+* Phone & computer on the same WiFi network
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 🚀 Installation
 
-## Get a fresh project
-
-When you're ready, run:
+### 1. Clone the repository
 
 ```bash
-npm run reset-project
+git clone https://github.com/yourusername/chess-clock.git
+cd chess-clock
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### 2. Install dependencies
 
-## Learn more
+```bash
+yarn install
+# or
+npm install
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+### 3. Start the Expo development server
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+yarn start
+# or
+npm start
+```
 
-## Join the community
+Scan the QR code using:
 
-Join our community of developers creating universal apps.
+* iOS → Camera app
+* Android → Expo Go app
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+## 🔧 Development Commands
+
+```bash
+yarn start         # Start dev server
+yarn android       # Run Android emulator
+yarn ios           # Run iOS simulator
+yarn web           # Web version
+yarn lint          # Run linting
+yarn format        # Format code using Prettier
+```
+
+---
+
+## 📁 Project Structure
+
+```plaintext
+app/
+  index.tsx
+  clock.tsx
+  _layout.tsx
+
+components/
+  TimeDisplay.tsx
+  TopBar.tsx
+
+context/
+  ThemeContext.tsx
+
+hooks/
+  useHaptics.ts
+  useSettings.ts
+
+constants/
+  theme.ts
+  settings.ts
+  presets.ts
+  timeSteps.ts
+
+utils/
+  formatTime.ts
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### App won't load?
+
+1. Ensure both devices are on the same WiFi
+2. Restart Metro bundler (`r`)
+3. Hard clear Metro cache:
+
+```bash
+expo start --clear
+```
+
+4. Restart Expo Go app
+
+### TypeScript errors with vector icons?
+
+Create the file:
+
+```
+@types/react-native-vector-icons/index.d.ts
+```
+
+Add:
+
+```ts
+declare module "react-native-vector-icons/MaterialIcons";
+```
+
+---
+
+## 🎯 Learning Goals
+
+* Understanding React Native components
+* State management & user settings
+* Theme switching using React Context
+* Time formatting utilities
+* Expo Router file-based navigation
+* TypeScript in mobile development
+
+---
+
+## 🔮 Future Improvements
+
+* Additional time control modes (Fischer, Bronstein)
+* Custom themes
+* Sound & haptic variations
+* Animations
+* Local or online multiplayer
+
+---
+
+**Happy coding! 🚀**
