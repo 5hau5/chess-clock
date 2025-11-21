@@ -9,53 +9,41 @@ export default function formatTime(
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
 
+  const fractional = sec - totalSeconds;
+
+  // Determine if ms should be shown
+  const showMs = {
+    always: true,
+    never: false,
+    "below-1min": sec < 60,
+    "below-30sec": sec < 30,
+    "below-10sec": sec < 10,
+  }[threshold];
+
   let ms = 0;
-  let showMs = false;
-
-  // Determine if milliseconds should be shown
-  switch (threshold) {
-    case "always":
-      showMs = true;
-      break;
-    case "never":
-      showMs = false;
-      break;
-    case "below-1min":
-      showMs = sec < 60;
-      break;
-    case "below-30sec":
-      showMs = sec < 30;
-      break;
-    case "below-10sec":
-      showMs = sec < 10;
-      break;
-  }
-
   if (showMs) {
-    switch (format) {
-      case "tenths":
-        ms = Math.floor((sec - totalSeconds) * 10);
-        break;
-      case "hundredths":
-        ms = Math.floor((sec - totalSeconds) * 100);
-        break;
-      case "all":
-        ms = Math.floor((sec - totalSeconds) * 1000);
-        break;
-    }
+    const multipliers = {
+      tenths: 10,
+      hundredths: 100,
+      all: 1000,
+    };
+    ms = Math.floor(fractional * multipliers[format]);
   }
 
   const secStr = seconds.toString().padStart(2, "0");
 
-  if (showMs) {
-    const msStr =
-      format === "hundredths"
-        ? ms.toString().padStart(2, "0")
-        : format === "all"
-        ? ms.toString().padStart(3, "0")
-        : ms.toString();
-    return `${minutes}:${secStr}.${msStr}`;
+  if (!showMs) {
+    return `${minutes}:${secStr}`;
   }
 
-  return `${minutes}:${secStr}`;
+  // Build ms string
+  const msPad = {
+    tenths: 1,
+    hundredths: 2,
+    all: 3,
+  }[format];
+
+  const msStr = ms.toString().padStart(msPad, "0");
+
+  return `${minutes}:${secStr}.${msStr}`;
 }

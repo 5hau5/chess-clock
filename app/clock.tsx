@@ -1,107 +1,172 @@
+// app/clock.tsx
 import { useLocalSearchParams } from "expo-router";
-import React, { useEffect, useState, useRef, useContext } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Vibration } from "react-native";
+import React, { useEffect, useRef, useState, useContext } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Vibration,
+  Platform,
+} from "react-native";
 import { ThemeContext } from "../context/ThemeContext";
 import { useSettings } from "../hooks/useSettings";
 import formatTime from "../utils/formatTime";
 import { haptics } from "../hooks/useHaptics";
-import Icon from "react-native-vector-icons/MaterialIcons"; 
+import Icon from "react-native-vector-icons/MaterialIcons";
+
+/**
+ * Chess clock screen.
+ *
+ * Responsibilities:
+ *  - Start / stop / switch sides
+ *  - Accurate countdown using delta time (Date.now)
+ *  - Pause / restart controls
+ *  - Small vibration when a side runs out of time
+ *  - Soft red border when a side has "lost"
+ *
+ * Notes / decisions:
+ *  - We keep precise remaining time in refs (whiteTimerRef/blackTimerRef)
+ *    and mirror to state for rendering. This avoids setInterval rounding drift.
+ *  - intervalRef typed using ReturnType<typeof setInterval> for cross-platform safety.
+ */
+
+type Turn = "white" | "black" | null;
 
 export default function ClockScreen() {
   const { theme } = useContext(ThemeContext);
   const { settings } = useSettings();
   const params = useLocalSearchParams();
 
+  // query params fallback (defaults)
   const base = Number(params.time) || 300;
   const increment = Number(params.inc) || 0;
 
-  const [white, setWhite] = useState(base);
-  const [black, setBlack] = useState(base);
-  const [turn, setTurn] = useState<"white" | "black" | null>(null);
-  const [paused, setPaused] = useState(false);
-  const [whiteLost, setWhiteLost] = useState(false);
-  const [blackLost, setBlackLost] = useState(false);
+  // UI states (number = remaining seconds, can be fractional)
+  const [white, setWhite] = useState<number>(base);
+  const [black, setBlack] = useState<number>(base);
+  const [turn, setTurn] = useState<Turn>(null);
+  const [paused, setPaused] = useState<boolean>(false);
+  const [whiteLost, setWhiteLost] = useState<boolean>(false);
+  const [blackLost, setBlackLost] = useState<boolean>(false);
 
+  // refs for the actual timers and scheduling
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const lastUpdate = useRef(Date.now());
-  const whiteTimer = useRef<number>(base);
-  const blackTimer = useRef<number>(base);
+  const lastUpdateRef = useRef<number>(Date.now());
+  const whiteTimerRef = useRef<number>(base);
+  const blackTimerRef = useRef<number>(base);
 
+  // start/stop effect for the ticking loop
   useEffect(() => {
-    if (!turn || paused) return;
+    // Do not run if paused, nobody's turn, or someone already lost
+    if (!turn || paused || whiteLost || blackLost) return;
 
-    lastUpdate.current = Date.now();
-    if (intervalRef.current !== null) clearInterval(intervalRef.current);
+    // initialize timing
+    lastUpdateRef.current = Date.now();
 
+    // clear any previous interval
+    if (intervalRef.current !== null) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    // run; small interval (~60fps) using delta time for accuracy
     intervalRef.current = setInterval(() => {
       const now = Date.now();
-      const delta = (now - lastUpdate.current) / 1000;
-      lastUpdate.current = now;
+      const delta = (now - lastUpdateRef.current) / 1000; // seconds
+      lastUpdateRef.current = now;
 
       if (turn === "white") {
-        whiteTimer.current -= delta;
-        const remaining = Math.max(whiteTimer.current, 0);
+        whiteTimerRef.current -= delta;
+        const remaining = Math.max(whiteTimerRef.current, 0);
         setWhite(remaining);
+
         if (remaining <= 0 && !whiteLost) {
           setWhiteLost(true);
+          // short vibration to indicate loss
           Vibration.vibrate(50);
-          clearInterval(intervalRef.current!);
-          intervalRef.current = null;
+          // stop the clock
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
           setTurn(null);
         }
       } else if (turn === "black") {
-        blackTimer.current -= delta;
-        const remaining = Math.max(blackTimer.current, 0);
+        blackTimerRef.current -= delta;
+        const remaining = Math.max(blackTimerRef.current, 0);
         setBlack(remaining);
+
         if (remaining <= 0 && !blackLost) {
           setBlackLost(true);
           Vibration.vibrate(50);
-          clearInterval(intervalRef.current!);
-          intervalRef.current = null;
+          if (intervalRef.current) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+          }
           setTurn(null);
         }
       }
     }, 16);
 
+    // cleanup when turn changes or component unmounts
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      intervalRef.current = null;
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
-  }, [turn, paused]);
+    // turn/paused/whiteLost/blackLost control when effect runs
+  }, [turn, paused, whiteLost, blackLost]);
 
+  // make sure timers are persisted to refs when user restarts or incrementing
+  useEffect(() => {
+    whiteTimerRef.current = white;
+  }, [white]);
+
+  useEffect(() => {
+    blackTimerRef.current = black;
+  }, [black]);
+
+  // user presses a side
   function handlePress(side: "white" | "black") {
-    // stop clicks if the game ended or paused
+    // Do nothing if paused or game already finished
     if (paused || (turn === null && (white <= 0 || black <= 0))) return;
 
+    // start: first tap starts the opposite side
     if (!turn) {
       setTurn(side === "white" ? "black" : "white");
+      haptics.tap();
       return;
     }
 
+    // only allow pressing the active side to finish your move
     if (turn === side) {
       if (turn === "white") {
-        whiteTimer.current += increment;
+        whiteTimerRef.current += increment;
         setWhite((t) => t + increment);
         setTurn("black");
       } else {
-        blackTimer.current += increment;
+        blackTimerRef.current += increment;
         setBlack((t) => t + increment);
         setTurn("white");
       }
+      haptics.tap();
     }
-    haptics.tap();
   }
 
+  // toggle paused (pausing prevents further switching)
   function togglePause() {
     setPaused((p) => !p);
     haptics.tap();
   }
 
+  // restart everything
   function restartGame() {
+    whiteTimerRef.current = base;
+    blackTimerRef.current = base;
     setWhite(base);
     setBlack(base);
-    whiteTimer.current = base;
-    blackTimer.current = base;
     setTurn(null);
     setWhiteLost(false);
     setBlackLost(false);
@@ -109,20 +174,22 @@ export default function ClockScreen() {
     haptics.tap();
   }
 
-  const formatClock = (t: number) =>
-    formatTime(t, settings.timeFormat, settings.subSecondThreshold);
+  // format using your existing util (it understands format + threshold)
+  const formatClock = (t: number) => formatTime(t, settings.timeFormat, settings.subSecondThreshold);
+
+  // small helper for border style on lost side
+  const lostBorderStyle = (lost: boolean) =>
+    lost ? { borderColor: "rgba(255,0,0,0.35)", borderWidth: 6 } : { borderColor: "transparent", borderWidth: 0 };
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* White Timer */}
+      {/* Top (white) timer — text flipped so opponent sees it properly */}
       <TouchableOpacity
+        activeOpacity={0.95}
         style={[
           styles.timer,
-          { 
-            backgroundColor: turn === "white" ? theme.clockActive : theme.clockInactive ,
-            borderColor: whiteLost ? "rgba(255,0,0,0.4)" : "transparent",
-            borderWidth: whiteLost ? 5 : 0
-          },
+          { backgroundColor: turn === "white" ? theme.clockActive : theme.clockInactive },
+          lostBorderStyle(whiteLost),
         ]}
         onPress={() => handlePress("white")}
       >
@@ -131,8 +198,8 @@ export default function ClockScreen() {
             styles.time,
             {
               color: theme.text,
-              transform: [{ scaleY: -1 }, { scaleX: -1 }], // flipped
-              fontSize: 77, // slightly bigger x1.1
+              transform: [{ scaleY: -1 }, { scaleX: -1 }], // flipped for opponent
+              fontSize: 77,
             },
           ]}
         >
@@ -140,31 +207,42 @@ export default function ClockScreen() {
         </Text>
       </TouchableOpacity>
 
-      {/* Control Bar */}
+      {/* control bar (between timers) */}
       <View style={[styles.controlBar, { backgroundColor: theme.background }]}>
-        <TouchableOpacity style={styles.controlButton} onPress={togglePause}>
-          <Icon name={paused ? "play-arrow" : "pause"} size={32} color={theme.text} />
+        <TouchableOpacity
+          accessibilityLabel={paused ? "Resume" : "Pause"}
+          accessibilityRole="button"
+          style={styles.controlButton}
+          onPress={() => {
+            togglePause();
+          }}
+        >
+          <Icon name={paused ? "play-arrow" : "pause"} size={28} color={theme.text} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.controlButton} onPress={restartGame}>
-          <Icon name="refresh" size={32} color={theme.text} />
+
+        <TouchableOpacity
+          accessibilityLabel="Restart game"
+          accessibilityRole="button"
+          style={styles.controlButton}
+          onPress={() => {
+            restartGame();
+          }}
+        >
+          <Icon name="refresh" size={28} color={theme.text} />
         </TouchableOpacity>
       </View>
 
-      {/* Black Timer */}
+      {/* Bottom (black) timer */}
       <TouchableOpacity
+        activeOpacity={0.95}
         style={[
           styles.timer,
-          { 
-            backgroundColor: turn === "black" ? theme.clockActive : theme.clockInactive,
-            borderColor: blackLost ? "rgba(255,0,0,0.4)" : "transparent",
-            borderWidth: blackLost ? 15 : 0
-          },
+          { backgroundColor: turn === "black" ? theme.clockActive : theme.clockInactive },
+          lostBorderStyle(blackLost),
         ]}
         onPress={() => handlePress("black")}
       >
-        <Text style={[styles.time, { color: theme.text, fontSize: 77 }]}>
-          {formatClock(black)}
-        </Text>
+        <Text style={[styles.time, { color: theme.text, fontSize: 77 }]}>{formatClock(black)}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -173,7 +251,7 @@ export default function ClockScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   timer: { flex: 1, alignItems: "center", justifyContent: "center" },
-  time: { fontWeight: "bold" },
-  controlBar: { flexDirection: "row", justifyContent: "space-around", paddingVertical: 10 },
-  controlButton: { padding: 12, borderRadius: 10 },
+  time: { fontWeight: "bold", textAlign: "center" },
+  controlBar: { flexDirection: "row", justifyContent: "space-around", paddingVertical: 8 },
+  controlButton: { padding: 10, borderRadius: 8 },
 });

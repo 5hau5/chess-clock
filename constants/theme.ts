@@ -1,3 +1,4 @@
+// Shared theme structure for both Dark and Light modes.
 export type Theme = {
   background: string;
   text: string;
@@ -16,8 +17,7 @@ export type Theme = {
   clockInactive: string;
 };
 
-
-
+// Light mode color palette.
 export const LightTheme: Theme = {
   background: "#fff2dcff",
   text: "#120e07ff",
@@ -25,7 +25,7 @@ export const LightTheme: Theme = {
   cardActive: "#bbab8fff",
   modalBackground: "rgba(0,0,0,0.5)",
   modalCard: "#fff2dcff",
-  buttonPrimary: "#ffbc5fff",
+  buttonPrimary: "#bb8b47ff",
   buttonSecondary: "#61401bff",
   subtleText: "#876533ff",
   safeAreaColor: "#ffe1baff",
@@ -33,9 +33,10 @@ export const LightTheme: Theme = {
   accent: "#ffab52ff",
   sliderThumb: "#ffbc5fff",
   clockActive: "#ffe9c3ff",
-  clockInactive:"#bbab8fff",
+  clockInactive: "#bbab8fff",
 };
 
+// Dark mode color palette.
 export const DarkTheme: Theme = {
   background: "#312126ff",
   text: "#FFFFFF",
@@ -51,7 +52,5 @@ export const DarkTheme: Theme = {
   accent: "#a43362ff",
   sliderThumb: "#a12e5aff",
   clockActive: "#634453ff",
-  clockInactive:"#39262dff",  
+  clockInactive: "#39262dff",
 };
-
-
