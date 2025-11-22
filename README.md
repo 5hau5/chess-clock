@@ -1,11 +1,11 @@
-# ⏱️ Chess Clock (Expo + React Native)
+# Chess Clock (Expo + React Native)
 
 A simple and lightweight chess clock built with **Expo**, **React Native**, and **TypeScript**.
 This project demonstrates mobile app development concepts including timers, theming, state management, navigation, and persistent settings.
 
 ---
 
-## 📌 Features
+## Features
 
 * Two-player chess clock
 * Tap to switch turns
@@ -17,7 +17,7 @@ This project demonstrates mobile app development concepts including timers, them
 
 ---
 
-## 📦 Prerequisites
+## Prerequisites
 
 * Node.js (LTS recommended)
 * Expo CLI
@@ -26,7 +26,7 @@ This project demonstrates mobile app development concepts including timers, them
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### 1. Clone the repository
 
@@ -71,7 +71,7 @@ yarn format        # Format code using Prettier
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```plaintext
 app/
@@ -102,7 +102,7 @@ utils/
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### App won't load?
 
@@ -130,27 +130,4 @@ Add:
 declare module "react-native-vector-icons/MaterialIcons";
 ```
 
----
 
-## 🎯 Learning Goals
-
-* Understanding React Native components
-* State management & user settings
-* Theme switching using React Context
-* Time formatting utilities
-* Expo Router file-based navigation
-* TypeScript in mobile development
-
----
-
-## 🔮 Future Improvements
-
-* Additional time control modes (Fischer, Bronstein)
-* Custom themes
-* Sound & haptic variations
-* Animations
-* Local or online multiplayer
-
----
-
-**Happy coding! 🚀**
