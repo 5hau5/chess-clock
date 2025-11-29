@@ -58,7 +58,7 @@ Scan the QR code using:
 
 ---
 
-## 🔧 Development Commands
+##  Development Commands
 
 ```bash
 yarn start         # Start dev server
@@ -130,4 +130,44 @@ Add:
 declare module "react-native-vector-icons/MaterialIcons";
 ```
 
+---
 
+
+## Screenshots of views and their basic use / features
+
+### Main page:
+
+![index](ss/Screenshot_Index.png)
+
+1. Select from predetermined game presets
+2. Select to make a custom game
+3. Go to settings
+
+
+### Custom game selection modal:
+
+![custom](ss/Screenshot_CustomModal.png)
+
+1. Set game time
+2. Set game increment
+3. Start the game or not
+
+
+### Settings and preferences page:
+
+![settings](ss/Screenshot_Settings.png)
+
+1. Set Darkmode or lightmode
+2. Set at what time to show the sub-second display via slider
+3. Set a thew sub-second format to show
+4. Set whether for the app to remember the last used custom game settings or not
+
+
+## The chess clock
+
+![clock](ss/Screenshot_Clock.png)
+
+1. Switch which clock ticks down after making a move and tapping the highlighted, ticking down side
+2. Reset the clock
+3. Pause the clock
+4. Pause the game and display red border on the side that runs out of time
